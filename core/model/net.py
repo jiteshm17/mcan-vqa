@@ -88,8 +88,8 @@ class Net(nn.Module):
         self.attflat_img = AttFlat(__C)
         self.attflat_lang = AttFlat(__C)
 
-        self.proj_norm = LayerNorm(__C.FLAT_OUT_SIZE)
-        self.proj = nn.Linear(__C.FLAT_OUT_SIZE, answer_size)
+        self.proj_norm = LayerNorm(2048)
+        self.proj = nn.Linear(2048, answer_size)
 
 
     def forward(self, img_feat, ques_ix):
@@ -123,7 +123,34 @@ class Net(nn.Module):
             img_feat_mask
         )
 
-        proj_feat = lang_feat + img_feat
+        NUM_LAYERS = 3
+        conv_layer_1 = nn.Linear(1024,2048)
+        conv_layer_2 = nn.ModuleList([
+            nn.Linear(2048, 2048)
+            for i in range(NUM_LAYERS)])
+
+        feat1 = conv_layer_1(img_feat)
+        feat2 = conv_layer_1(lang_feat)
+        # feat1 = nn.Dropout(0.25)(feat1)
+        # feat2 = nn.Dropout(0.25)(feat2)
+
+        x_mm = []
+
+        for i in range(NUM_LAYERS):
+            x1 = conv_layer_2[i](feat1)
+            x1 = nn.Tanh()(x1)
+
+            x2 = conv_layer_2[i](feat2)
+            x2 = nn.Tanh()(x2)
+
+            x_mm.append(torch.mul(x1,x2))
+
+        x_mm = torch.stack(x_mm,dim=1)
+        # batch_size = x_mm.size(0)
+        # nc,w,h = x_mm.shape[2],x_mm.shape[3],x_mm.shape[4]
+        proj_feat = torch.sum(x_mm,dim=1)
+
+        # proj_feat = lang_feat + img_feat
         proj_feat = self.proj_norm(proj_feat)
         proj_feat = torch.sigmoid(self.proj(proj_feat))
 
