@@ -16,6 +16,8 @@ import numpy as np
 import torch.nn as nn
 import torch.utils.data as Data
 
+from torch.autograd import Variable
+
 
 class Execution:
     def __init__(self, __C):
@@ -48,7 +50,7 @@ class Execution:
             token_size,
             ans_size
         )
-        # net.cuda()
+        net.cuda()
         net.train()
 
         # Define the multi-gpu training if needed
@@ -57,7 +59,9 @@ class Execution:
 
         # Define the binary cross entropy loss
         # loss_fn = torch.nn.BCELoss(size_average=False).cuda()
-        # loss_fn = torch.nn.BCELoss(reduction='sum').cuda()
+        # loss_fn = torch.nn.BCEWithLogitsLoss().cuda()
+        # loss_fn = torch.nn.BCELoss().cuda()
+        # loss_fn = torch.nn.CrossEntropyLoss().cuda()
         loss_fn = torch.nn.BCELoss(reduction='sum')
 
         # Load checkpoint if resume training
@@ -154,9 +158,9 @@ class Execution:
 
                 optim.zero_grad()
 
-                # img_feat_iter = img_feat_iter.cuda()
-                # ques_ix_iter = ques_ix_iter.cuda()
-                # ans_iter = ans_iter.cuda()
+                img_feat_iter = img_feat_iter.cuda()
+                ques_ix_iter = ques_ix_iter.cuda()
+                ans_iter = ans_iter.cuda()
 
                 for accu_step in range(self.__C.GRAD_ACCU_STEPS):
 
@@ -175,7 +179,10 @@ class Execution:
                         sub_img_feat_iter,
                         sub_ques_ix_iter
                     )
-
+                    
+                    # sub_ans_iter = Variable(sub_ans_iter)
+                    # pred = Variable(pred)
+                    
                     loss = loss_fn(pred, sub_ans_iter)
                     # only mean-reduction needs be divided by grad_accu_steps
                     # removing this line wouldn't change our results because the speciality of Adam optimizer,
@@ -320,7 +327,7 @@ class Execution:
             token_size,
             ans_size
         )
-        # net.cuda()
+        net.cuda()
         net.eval()
 
         if self.__C.N_GPU > 1:
@@ -346,8 +353,8 @@ class Execution:
                 int(data_size / self.__C.EVAL_BATCH_SIZE),
             ), end='          ')
 
-            # img_feat_iter = img_feat_iter.cuda()
-            # ques_ix_iter = ques_ix_iter.cuda()
+            img_feat_iter = img_feat_iter.cuda()
+            ques_ix_iter = ques_ix_iter.cuda()
 
             pred = net(
                 img_feat_iter,
