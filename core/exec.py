@@ -110,8 +110,8 @@ class Execution:
                 dataset,
                 batch_size=self.__C.BATCH_SIZE,
                 shuffle=False,
-                num_workers=self.__C.NUM_WORKERS,
-                pin_memory=self.__C.PIN_MEM,
+                num_workers=0,
+                pin_memory=False,
                 drop_last=True
             )
         else:
@@ -119,8 +119,8 @@ class Execution:
                 dataset,
                 batch_size=self.__C.BATCH_SIZE,
                 shuffle=True,
-                num_workers=self.__C.NUM_WORKERS,
-                pin_memory=self.__C.PIN_MEM,
+                num_workers=0,
+                pin_memory=False,
                 drop_last=True
             )
 
@@ -313,6 +313,7 @@ class Execution:
 
         # Store the prediction list
         qid_list = [ques['question_id'] for ques in dataset.ques_list]
+        # qid_list = qid_list[:10]
         ans_ix_list = []
         pred_list = []
 
@@ -339,8 +340,8 @@ class Execution:
             dataset,
             batch_size=self.__C.EVAL_BATCH_SIZE,
             shuffle=False,
-            num_workers=self.__C.NUM_WORKERS,
-            pin_memory=True
+            num_workers=0,
+            pin_memory=False
         )
 
         for step, (
@@ -393,7 +394,9 @@ class Execution:
             'answer': dataset.ix_to_ans[str(ans_ix_list[qix])],  # ix_to_ans(load with json) keys are type of string
             'question_id': int(qid_list[qix])
         }for qix in range(qid_list.__len__())]
-
+        
+        print('For writing the results to val file')
+        
         # Write the results to result file
         if valid:
             if val_ckpt_flag:
