@@ -84,11 +84,12 @@ class PredictLayer(nn.Module):
     def forward(self, data1, data2, mask1, mask2):
         weighted1 = self.summaries[0](data1, data1, mask1)
         weighted2 = self.summaries[1](data2, data2, mask2)
-        weighted = torch.cat([weighted1, weighted2], dim=1)
+        # weighted = torch.cat([weighted1, weighted2], dim=1)
 
-        mm = fusions.Block([2048, 1024], 3072).cuda()
+        mm = fusions.MLB([2048, 1024], 3072).cuda()
         proj_feat = mm([weighted1, weighted2])
         # return proj_feat
+        # feat = self.predict(weighted)
         feat = self.predict(proj_feat)
         return feat
         
@@ -371,7 +372,7 @@ class Net(nn.Module):
         self.dense_coattn = DCNLayer(2048, 1024, 4, 3, 5, 0.3)
         self.predict = PredictLayer(2048, 1024, 4, 3129, 0.3)
 
-        # self.apply(Initializer.xavier_normal)
+        self.apply(Initializer.xavier_normal)
 
     def forward(self, img_feat, ques_ix):
 

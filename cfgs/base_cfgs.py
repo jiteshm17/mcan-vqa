@@ -53,7 +53,7 @@ class Cfgs(PATH):
         self.RUN_MODE = 'train'
 
         # Set True to evaluate offline
-        self.EVAL_EVERY_EPOCH = True
+        self.EVAL_EVERY_EPOCH = False
 
         # Set True to save the prediction vector (Ensemble)
         self.TEST_SAVE_PRED = False
@@ -227,7 +227,7 @@ class Cfgs(PATH):
         self.SUB_BATCH_SIZE = int(self.BATCH_SIZE / self.GRAD_ACCU_STEPS)
 
         # Use a small eval batch will reduce gpu memory usage
-        self.EVAL_BATCH_SIZE = int(self.SUB_BATCH_SIZE / 2)
+        self.EVAL_BATCH_SIZE = int(self.SUB_BATCH_SIZE)
 
 
         # ------------ Networks setup

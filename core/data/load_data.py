@@ -26,7 +26,7 @@ class DataSet(Data.Dataset):
         self.img_feat_path_list = []
         split_list = __C.SPLIT[__C.RUN_MODE].split('+')
         for split in split_list:
-            if split in ['train', 'val', 'test']:
+            if split in ['train', 'val']:
                 self.img_feat_path_list += glob.glob(__C.IMG_FEAT_PATH[split] + '*.npz')
 
         # if __C.EVAL_EVERY_EPOCH and __C.RUN_MODE in ['train']:
@@ -41,9 +41,10 @@ class DataSet(Data.Dataset):
         # Loading question word list
         self.stat_ques_list = \
             json.load(open(__C.QUESTION_PATH['train'], 'r'))['questions'] + \
-            json.load(open(__C.QUESTION_PATH['val'], 'r'))['questions'] + \
-            json.load(open(__C.QUESTION_PATH['test'], 'r'))['questions'] + \
-            json.load(open(__C.QUESTION_PATH['vg'], 'r'))['questions']
+            json.load(open(__C.QUESTION_PATH['val'], 'r'))['questions']
+            # json.load(open(__C.QUESTION_PATH['test'], 'r'))['questions'] + \
+            # json.load(open(__C.QUESTION_PATH['vg'], 'r'))['questions']
+            
 
         # Loading answer word list
         # self.stat_ans_list = \
