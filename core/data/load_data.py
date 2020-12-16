@@ -26,10 +26,8 @@ class DataSet(Data.Dataset):
         self.img_feat_path_list = []
         split_list = __C.SPLIT[__C.RUN_MODE].split('+')
         for split in split_list:
-            if split in ['train']:
+            if split in ['train', 'val']:
                 self.img_feat_path_list += glob.glob(__C.IMG_FEAT_PATH[split] + '*.npz')
-
-        print('Length of image features',len(self.img_feat_path_list))
 
         # if __C.EVAL_EVERY_EPOCH and __C.RUN_MODE in ['train']:
         #     self.img_feat_path_list += glob.glob(__C.IMG_FEAT_PATH['val'] + '*.npz')
@@ -41,37 +39,28 @@ class DataSet(Data.Dataset):
         #         glob.glob(__C.IMG_FEAT_PATH['test'] + '*.npz')
 
         # Loading question word list
-        # self.stat_ques_list = \
-            # json.load(open(__C.QUESTION_PATH['train'], 'r'))['questions'] + \
-            # json.load(open(__C.QUESTION_PATH['val'], 'r'))['questions'] + \
+        self.stat_ques_list = \
+            json.load(open(__C.QUESTION_PATH['train'], 'r'))['questions'] + \
+            json.load(open(__C.QUESTION_PATH['val'], 'r'))['questions']
             # json.load(open(__C.QUESTION_PATH['test'], 'r'))['questions'] + \
             # json.load(open(__C.QUESTION_PATH['vg'], 'r'))['questions']
-
-        self.stat_ques_list = json.load(open(__C.QUESTION_PATH['train'], 'r'))['questions']
-
-        print('Length of questions',len(self.stat_ques_list))
+            
 
         # Loading answer word list
         # self.stat_ans_list = \
         #     json.load(open(__C.ANSWER_PATH['train'], 'r'))['annotations'] + \
         #     json.load(open(__C.ANSWER_PATH['val'], 'r'))['annotations']
 
-        self.stat_ans_list = json.load(open(__C.ANSWER_PATH['train'], 'r'))['annotations']
-
-        print('Length of answers',len(self.stat_ans_list))
-
         # Loading question and answer list
         self.ques_list = []
         self.ans_list = []
-        print('Loading the annotation files')
+
         split_list = __C.SPLIT[__C.RUN_MODE].split('+')
-        split_list = ['train']
         for split in split_list:
             self.ques_list += json.load(open(__C.QUESTION_PATH[split], 'r'))['questions']
             if __C.RUN_MODE in ['train']:
                 self.ans_list += json.load(open(__C.ANSWER_PATH[split], 'r'))['annotations']
 
-        print('Finished loading the annotation files!!!')
         # Define run data size
         if __C.RUN_MODE in ['train']:
             self.data_size = self.ans_list.__len__()
@@ -95,8 +84,6 @@ class DataSet(Data.Dataset):
         else:
             self.iid_to_img_feat_path = img_feat_path_load(self.img_feat_path_list)
 
-
-        # self.ques_list = self.ques_list[:7]
         # {question id} -> {question}
         self.qid_to_ques = ques_load(self.ques_list)
 

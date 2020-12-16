@@ -14,7 +14,7 @@ DATASET_PATH = '../datasets/vqa/'
 ANSWER_PATH = {
     'train': DATASET_PATH + 'v2_mscoco_train2014_annotations.json',
     'val': DATASET_PATH + 'v2_mscoco_val2014_annotations.json',
-    'vg': DATASET_PATH + 'VG_annotations.json',
+    # 'vg': DATASET_PATH + 'VG_annotations.json',
 }
 
 # Loading answer word list

@@ -53,7 +53,7 @@ class Cfgs(PATH):
         self.RUN_MODE = 'train'
 
         # Set True to evaluate offline
-        self.EVAL_EVERY_EPOCH = True
+        self.EVAL_EVERY_EPOCH = False
 
         # Set True to save the prediction vector (Ensemble)
         self.TEST_SAVE_PRED = False
@@ -124,7 +124,7 @@ class Cfgs(PATH):
 
         # Model hidden size
         # (512 as default, bigger will be a sharp increase of gpu memory usage)
-        self.HIDDEN_SIZE = 512
+        self.HIDDEN_SIZE = 1024
 
         # Multi-head number in MCA layers
         # (Warning: HIDDEN_SIZE should be divided by MULTI_HEAD)
@@ -216,7 +216,7 @@ class Cfgs(PATH):
         # ------------ Split setup
         self.SPLIT['train'] = self.TRAIN_SPLIT
         if 'val' in self.SPLIT['train'].split('+') or self.RUN_MODE not in ['train']:
-            self.EVAL_EVERY_EPOCH = False
+            self.EVAL_EVERY_EPOCH = True
 
         if self.RUN_MODE not in ['test']:
             self.TEST_SAVE_PRED = False
@@ -227,7 +227,7 @@ class Cfgs(PATH):
         self.SUB_BATCH_SIZE = int(self.BATCH_SIZE / self.GRAD_ACCU_STEPS)
 
         # Use a small eval batch will reduce gpu memory usage
-        self.EVAL_BATCH_SIZE = int(self.SUB_BATCH_SIZE / 2)
+        self.EVAL_BATCH_SIZE = int(self.SUB_BATCH_SIZE)
 
 
         # ------------ Networks setup
