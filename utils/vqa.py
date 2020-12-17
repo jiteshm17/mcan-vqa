@@ -47,12 +47,13 @@ class VQA:
 	def createIndex(self):
 		# create index
 		print('creating index...')
-		imgToQA = {ann['image_id']: [] for ann in self.dataset['annotations']}
+		imgToQA = {ann['image_id']: [] for ann in self.dataset['annotations'] if 'image_id' in ann}
 		qa = {ann['question_id']: [] for ann in self.dataset['annotations']}
 		qqa = {ann['question_id']: [] for ann in self.dataset['annotations']}
 		for ann in self.dataset['annotations']:
-			imgToQA[ann['image_id']] += [ann]
-			qa[ann['question_id']] = ann
+			if 'image_id' in ann:
+				imgToQA[ann['image_id']] += [ann]
+				qa[ann['question_id']] = ann
 		for ques in self.questions['questions']:
 			qqa[ques['question_id']] = ques
 		print('index created!')
@@ -161,18 +162,25 @@ class VQA:
 		time_t = datetime.datetime.utcnow()
 		anns = json.load(open(resFile))
 		assert type(anns) == list, 'results is not an array of objects'
-		annsQuesIds = [ann['question_id'] for ann in anns]
-		assert set(annsQuesIds) == set(self.getQuesIds()), \
-			'Results do not correspond to current VQA set. Either the results do not have predictions for all question ids in annotation file or there is atleast one question id that does not belong to the question ids in the annotation file.'
+		# annsQuesIds = [ann['question_id'] for ann in anns]
+		allQuestions = set(self.getQuesIds())
+		# assert set(annsQuesIds) == set(self.getQuesIds()), \
+		# 	'Results do not correspond to current VQA set. Either the results do not have predictions for all question ids in annotation file or there is atleast one question id that does not belong to the question ids in the annotation file.'
+		counter = 0
 		for ann in anns:
-			quesId = ann['question_id']
-			if res.dataset['task_type'] == 'Multiple Choice':
-				assert ann['answer'] in self.qqa[quesId][
-					'multiple_choices'], 'predicted answer is not one of the multiple choices'
-			qaAnn = self.qa[quesId]
-			ann['image_id'] = qaAnn['image_id']
-			ann['question_type'] = qaAnn['question_type']
-			ann['answer_type'] = qaAnn['answer_type']
+			if ann['question_id'] in allQuestions:
+				quesId = ann['question_id']
+				if res.dataset['task_type'] == 'Multiple Choice':
+					assert ann['answer'] in self.qqa[quesId][
+						'multiple_choices'], 'predicted answer is not one of the multiple choices'
+
+				qaAnn = self.qa[quesId]
+				ann['image_id'] = qaAnn['image_id']
+				ann['question_type'] = qaAnn['question_type']
+				ann['answer_type'] = qaAnn['answer_type']
+			else:
+				counter += 1
+		
 		print('DONE (t=%0.2fs)' % ((datetime.datetime.utcnow() - time_t).total_seconds()))
 
 		res.dataset['annotations'] = anns
