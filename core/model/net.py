@@ -86,7 +86,7 @@ class PredictLayer(nn.Module):
         weighted2 = self.summaries[1](data2, data2, mask2)
         # weighted = torch.cat([weighted1, weighted2], dim=1)
 
-        mm = fusions.MLB([2048, 1024], 3072).cuda()
+        mm = fusions.Tucker([2048, 1024], 3072).cuda()
         proj_feat = mm([weighted1, weighted2])
         # return proj_feat
         # feat = self.predict(weighted)

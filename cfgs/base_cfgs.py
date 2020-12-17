@@ -227,7 +227,7 @@ class Cfgs(PATH):
         self.SUB_BATCH_SIZE = int(self.BATCH_SIZE / self.GRAD_ACCU_STEPS)
 
         # Use a small eval batch will reduce gpu memory usage
-        self.EVAL_BATCH_SIZE = int(self.SUB_BATCH_SIZE)
+        self.EVAL_BATCH_SIZE = int(self.SUB_BATCH_SIZE/2)
 
 
         # ------------ Networks setup
